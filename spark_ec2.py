@@ -1111,6 +1111,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
     command = [
         'rsync', '-rv',
         '-e', stringify_command(ssh_command(opts)),
+        '--rsync-path="sudo rsync"',
         "%s/" % tmp_dir,
         "%s@%s:/" % (opts.user, active_master)
     ]
@@ -1130,6 +1131,7 @@ def deploy_user_files(root_dir, opts, master_nodes):
     command = [
         'rsync', '-rv',
         '-e', stringify_command(ssh_command(opts)),
+        '--rsync-path="sudo rsync"',
         "%s" % root_dir,
         "%s@%s:/" % (opts.user, active_master)
     ]
