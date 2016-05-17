@@ -2,7 +2,7 @@
 
 PERSISTENT_HDFS=/root/persistent-hdfs
 
-pushd /root/spark-ec2/persistent-hdfs
+pushd /root/spark-ec2/persistent-hdfs > /dev/null
 source ./setup-slave.sh
 
 for node in $SLAVES $OTHER_MASTERS; do
@@ -17,7 +17,6 @@ if [[ ! -e /vol/persistent-hdfs/dfs/name ]] ; then
   $PERSISTENT_HDFS/bin/hadoop namenode -format
 fi
 
-echo "Starting persistent HDFS..."
-$PERSISTENT_HDFS/bin/start-dfs.sh
+echo "Persistent HDFS installed, won't start by default..."
 
-popd
+popd > /dev/null

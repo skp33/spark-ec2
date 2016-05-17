@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
 
-# Set Spark environment variables for your site in this file. Some useful
-# variables to set are:
-# - MESOS_NATIVE_LIBRARY, to point to your Mesos native library (libmesos.so)
-# - SCALA_HOME, to point to your Scala installation
-# - SPARK_CLASSPATH, to add elements to Spark's classpath
-# - SPARK_JAVA_OPTS, to add JVM options
-# - SPARK_MEM, to change the amount of memory used per node (this should
-#   be in the same format as the JVM's -Xmx option, e.g. 300m or 1g).
-# - SPARK_LIBRARY_PATH, to add extra search paths for native libraries.
+export SPARK_LOCAL_DIRS="{{spark_local_dirs}}"
 
-export SCALA_HOME={{scala_home}}
-export MESOS_NATIVE_LIBRARY=/usr/local/lib/libmesos.so
+# Standalone cluster options
+export SPARK_MASTER_OPTS="{{spark_master_opts}}"
+if [ -n "{{spark_worker_instances}}" ]; then
+  export SPARK_WORKER_INSTANCES={{spark_worker_instances}}
+fi
+export SPARK_WORKER_CORES={{spark_worker_cores}}
 
-# Set Spark's memory per machine; note that you can also comment this out
-# and have the master's SPARK_MEM variable get passed to the workers.
-export SPARK_MEM={{default_spark_mem}}
-
-# Use the public hostname of this EC2 machine for web UIs
-export SPARK_PUBLIC_DNS=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
-
-# Set JVM options and Spark Java properties
-SPARK_JAVA_OPTS+=" -Dspark.local.dir={{spark_local_dirs}}"
-export SPARK_JAVA_OPTS
-
+export HADOOP_HOME="/root/ephemeral-hdfs"
 export SPARK_MASTER_IP={{active_master}}
+export MASTER=`cat /root/spark-ec2/cluster-url`
 
-# Uncomment the following to connect shells to the cluster by default
-#export MASTER=`cat /root/spark-ec2/cluster-url`
+export SPARK_SUBMIT_LIBRARY_PATH="$SPARK_SUBMIT_LIBRARY_PATH:/root/ephemeral-hdfs/lib/native/"
+export SPARK_SUBMIT_CLASSPATH="$SPARK_CLASSPATH:$SPARK_SUBMIT_CLASSPATH:/root/ephemeral-hdfs/conf"
+
+# Bind Spark's web UIs to this machine's public EC2 hostname otherwise fallback to private IP:
+export SPARK_PUBLIC_DNS=`
+wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname ||\
+wget -q -O - http://169.254.169.254/latest/meta-data/local-ipv4`
+
+# Used for YARN model
+export YARN_CONF_DIR="/root/ephemeral-hdfs/conf"
+
+# Set a high ulimit for large shuffles, only root can do this
+if [ $(id -u) == "0" ]
+then
+    ulimit -n 1000000
+fi
