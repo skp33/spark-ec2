@@ -94,8 +94,8 @@ else
         return 1
       fi
     ;;
-    # 2.0.0 - 2.0.1
-    2\.0\.[0-1]|2\.0\.0-preview)
+    # 2.0.0 - 2.0.2
+    2\.0\.[0-2]|2\.0\.0-preview)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
         echo "ERROR: Unknown Hadoop major version"
         return 1
