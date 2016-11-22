@@ -79,7 +79,8 @@ VALID_SPARK_VERSIONS = set([
     "1.6.2",
     "2.0.0-preview",
     "2.0.0",
-    "2.0.1"
+    "2.0.1",
+    "2.0.2"
 ])
 
 VALID_HADOOP_MINOR_VERSIONS = set([
